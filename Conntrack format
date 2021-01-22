@@ -1,0 +1,117 @@
+The format of a line from `/proc/net/ip_conntrack` is the same as for `/proc/net/nf_conntrack`, except the first two columns are missing.
+
+I'll try to summarize the format of the latter file, as I understand it from the [`net/netfilter/nf_conntrack_standalone.c`](https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/net/netfilter/nf_conntrack_standalone.c), [`net/netfilter/nf_conntrack_acct.c`](https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/net/netfilter/nf_conntrack_acct.c) and the `net/netfilter/nf_conntrack_proto_*.c` kernel source files. The term `layer` refers to the [OSI protocol layer](http://en.wikipedia.org/w/index.php?title=OSI_protocols&oldid=545448188) model.
+
+- First column: The network layer protocol name (eg. `ipv4`).
+- Second column: The network layer protocol number.
+- Third column: The transmission layer protocol name (eg. `tcp`).
+- Fourth column: The transmission layer protocol number.
+- Fifth column: The seconds until the entry is invalidated.
+- Sixth column (Not all protocols): The connection state.
+
+All other columns are named (`key=value`) or represent flags (`[UNREPLIED]`, `[ASSURED]`, ...). A line can contain up to two columns having the same name (eg. `src` and `dst`). Then, the first occurrence relates to the request direction and the second occurrence relates to the response direction.
+
+Meaning of the flags:
+
+- `[ASSURED]`: Traffic has been seen in both (ie. request and response) direction.
+- `[UNREPLIED]`: Traffic has not been seen in response direction yet. In case the connection tracking cache overflows, these connections are dropped first.
+
+Please note that some column names appear only for specific protocols (eg. `sport` and `dport` for TCP and UDP, `type` and `code` for ICMP). Other column names (eg. `mark`) appear only if the kernel was built with specific options.
+
+Examples:
+
+- `ipv4 2 tcp 6 300 ESTABLISHED src=1.1.1.2 dst=2.2.2.2 sport=2000 dport=80 src=2.2.2.2 dst=1.1.1.1 sport=80 dport=12000 [ASSURED] mark=0 use=2` belongs to an established TCP connection from host 1.1.1.2, port 2000, to host 2.2.2.2, port 80, from which responses are sent to host 1.1.1.1, port 12000, timing out in five minutes. For this connection, packets have been seen in both directions.
+- `ipv4 2 icmp 1 3 src=1.1.1.2 dst=1.1.1.1 type=8 code=0 id=32354 src=1.1.1.1 dst=1.1.1.2 type=0 code=0 id=32354 mark=0 use=2` belongs to an ICMP echo request packet from host 1.1.1.2 to host 1.1.1.1 with an expected echo reply packet from host 1.1.1.1 to host 1.1.1.2, timing out in three seconds.
+
+The response destination host is not necessarily the same as the request source host, as the request source address may have been masqueraded by the response destination host.
+
+------
+
+**Please note that the following information might not be up-to-date!**
+
+Fields available for all entries:
+
+- `bytes` (if accounting is enabled, request and response)
+- `delta-time` (if `CONFIG_NF_CONNTRACK_TIMESTAMP` is enabled)
+- `dst` (request and response)
+- `mark` (if `CONFIG_NF_CONNTRACK_MARK` is enabled)
+- `packets` (if accounting is enabled, request and response)
+- `secctx` (if `CONFIG_NF_CONNTRACK_SECMARK` is enabled)
+- `src` (request and response)
+- `use`
+- `zone` (if `CONFIG_NF_CONNTRACK_ZONES` is enabled)
+
+Fields available for [`dccp`](https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/net/netfilter/nf_conntrack_proto_dccp.c), [`sctp`](https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/net/netfilter/nf_conntrack_proto_sccp.c), [`tcp`](https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/net/netfilter/nf_conntrack_proto_tcp.c), [`udp`](https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/net/netfilter/nf_conntrack_proto_udp.c) and [`udplite`](https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/net/netfilter/nf_conntrack_proto_udplite.c) transmission layer protocols:
+
+- `dport` (request and response)
+- `sport` (request and response)
+
+Fields available for [`icmp`](https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/net/netfilter/nf_conntrack_proto_icmp.c) transmission layer protocol:
+
+- `code` (request and response)
+- `id` (request and response)
+- `type` (request and response)
+
+Fields available for [`gre`](https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/tree/net/netfilter/nf_conntrack_proto_gre.c) transmission layer protocol:
+
+- `dstkey` (request and response)
+- `srckey` (request and response)
+- `stream_timeout`
+- `timeout`
+
+Allowed values for the sixth field:
+
+- ```
+  dccp
+  ```
+
+   
+
+  transmission layer protocol
+
+  - `CLOSEREQ`
+  - `CLOSING`
+  - `IGNORE`
+  - `INVALID`
+  - `NONE`
+  - `OPEN`
+  - `PARTOPEN`
+  - `REQUEST`
+  - `RESPOND`
+  - `TIME_WAIT`
+
+- ```
+  sctp
+  ```
+
+   
+
+  transmission layer protocol
+
+  - `CLOSED`
+  - `COOKIE_ECHOED`
+  - `COOKIE_WAIT`
+  - `ESTABLISHED`
+  - `NONE`
+  - `SHUTDOWN_ACK_SENT`
+  - `SHUTDOWN_RECD`
+  - `SHUTDOWN_SENT`
+
+- ```
+  tcp
+  ```
+
+   
+
+  transmission layer protocol
+
+  - `CLOSE`
+  - `CLOSE_WAIT`
+  - `ESTABLISHED`
+  - `FIN_WAIT`
+  - `LAST_ACK`
+  - `NONE`
+  - `SYN_RECV`
+  - `SYN_SENT`
+  - `SYN_SENT2`
+  - `TIME_WAIT`
