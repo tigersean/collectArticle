@@ -4,7 +4,7 @@ Guest Author
 
 I drew this diagram on a white board for some customers recently. They seemed to like it (or were just being very polite) so I thought I redraw it for your amusement.
 
-![img](/home/ejungon/Documents/收集的文章/JVM Collectors.assets/collectors.jpg)
+![img](./JVM Collectors.assets/collectors.jpg)
 
 Each blue box represents a collector that is used to collect a generation. The young generation is collected by the blue boxes in the yellow region and the tenured generation is collected by the blue boxes in the gray region. 
 

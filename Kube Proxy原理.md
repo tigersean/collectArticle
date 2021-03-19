@@ -409,7 +409,7 @@ listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 3. (outbound)在POSTROUTING阶段，将所有报文转发到KUBE-POSTROUTING
 
-   ![image-20200821120858180](/home/ejungon/Documents/收集的文章/Untitled.assets/image-20200821120858180.png)
+   ![image-20200821120858180](./Untitled.assets/image-20200821120858180.png)
 
 4. 图中共有三个地方看到了KUBE-MARK-MASQ，前2个的原因是为了防止上面所说的"三角流量"， 最后一个的原因，是进行SNAT，将pod的地址，转成网关地址，类似容器网关地址，然后再通过SNAT转成node ip地址，最后转发出去。图中共有三个地方看到了KUBE-MARK-MASQ，前2个的原因是为了防止上面所说的"三角流量"， 最后一个的原因，是进行SNAT，将pod的地址，转成网关地址，类似容器网关地址，然后再通过SNAT转成node ip地址，最后转发出去。
 

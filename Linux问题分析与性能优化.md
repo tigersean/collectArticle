@@ -36,44 +36,44 @@ RED方法：监控服务的请求数（Rate）、错误数（Errors）、响应�
 
 USE方法：监控系统资源的使用率（Utilization）、饱和度（Saturation）、错误数（Errors）。
 
-![USE方法常见指标分类](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/use-metrics.png)
+![USE方法常见指标分类](./Linux问题分析与性能优化.assets/use-metrics.png)
 
 ## 性能分析工具
 
-![性能分析工具](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/analyst-tool.png)
+![性能分析工具](./Linux问题分析与性能优化.assets/analyst-tool.png)
 
 ## CPU分析思路
 
-![CPU指标](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/cpu-metrics.png)
+![CPU指标](./Linux问题分析与性能优化.assets/cpu-metrics.png)
 
-![CPU性能分析](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/cpu-analyst.png)
+![CPU性能分析](./Linux问题分析与性能优化.assets/cpu-analyst.png)
 
-![CPU分析工具](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/cpu-tools.png)
+![CPU分析工具](./Linux问题分析与性能优化.assets/cpu-tools.png)
 
 ## 内存分析思路
 
-![内存性能指标](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/memory-metrics.png)
+![内存性能指标](./Linux问题分析与性能优化.assets/memory-metrics.png)
 
-![内存性能分析](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/cpu-analyst.png)
+![内存性能分析](./Linux问题分析与性能优化.assets/cpu-analyst.png)
 
-![内存分析工具](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/memory-tools.png)
+![内存分析工具](./Linux问题分析与性能优化.assets/memory-tools.png)
 
 ## IO分析思路
 
-![文件系统IO指标](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/file-io-metrics.png)
+![文件系统IO指标](./Linux问题分析与性能优化.assets/file-io-metrics.png)
 
-![IO性能分析](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/io-analyst.png)
+![IO性能分析](./Linux问题分析与性能优化.assets/io-analyst.png)
 
-![IO分析工具](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/file-io-tools.png)
+![IO分析工具](./Linux问题分析与性能优化.assets/file-io-tools.png)
 
 ## 网络分析思路
 
-![网络性能指标](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/net-metrics.png)
+![网络性能指标](./Linux问题分析与性能优化.assets/net-metrics.png)
 
-![网络性能分析](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/net-analyst.png)
+![网络性能分析](./Linux问题分析与性能优化.assets/net-analyst.png)
 
-![网络性能工具](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/net-tools.png)
+![网络性能工具](./Linux问题分析与性能优化.assets/net-tools.png)
 
 ## 基准测试工具
 
-![基准测试工具](/home/ejungon/Documents/收集的文章/Linux问题分析与性能优化.assets/benchmark-tool.png)
+![基准测试工具](./Linux问题分析与性能优化.assets/benchmark-tool.png)

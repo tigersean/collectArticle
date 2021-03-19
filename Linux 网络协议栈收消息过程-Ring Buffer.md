@@ -8,7 +8,7 @@ Jul 23, 2017 | Hits
 
 Ring Buffer 相关的收消息过程大致如下：
 
-[![图片来自参考1，对 raise softirq 的函数名做了修改，改为了 napi_schedule](/home/ejungon/Documents/收集的文章/Linux 网络协议栈收消息过程-Ring Buffer.assets/ring-buffer.png)](https://ylgrgyq.github.io/2017/07/23/linux-receive-packet-1/ring-buffer.png)
+[![图片来自参考1，对 raise softirq 的函数名做了修改，改为了 napi_schedule](./Linux 网络协议栈收消息过程-Ring Buffer.assets/ring-buffer.png)](https://ylgrgyq.github.io/2017/07/23/linux-receive-packet-1/ring-buffer.png)
 图片来自参考1，对 raise softirq 的函数名做了修改，改为了 napi_schedule
 
 NIC (network interface card) 在系统启动过程中会向系统注册自己的各种信息，系统会分配 Ring Buffer 队列也会分配一块专门的内核内存区域给 NIC 用于存放传输上来的数据包。struct sk_buff 是专门存放各种网络传输数据包的内存接口，在收到数据存放到 NIC 专用内核内存区域后，[sk_buff 内有个 data 指针会指向这块内存](http://elixir.free-electrons.com/linux/v4.4/source/include/linux/skbuff.h#L706)。Ring Buffer 队列内存放的是一个个 Packet Descriptor ，其有两种状态： ready 和 used 。初始时 Descriptor 是空的，指向一个空的 sk_buff，处在 ready 状态。当有数据时，[DMA ](https://en.wikipedia.org/wiki/DMA)负责从 NIC 取数据，并在 Ring Buffer 上按顺序找到下一个 ready 的 Descriptor，将数据存入该 Descriptor 指向的 sk_buff 中，并标记槽为 used。因为是按顺序找 ready 的槽，所以 Ring Buffer 是个 FIFO 的队列。

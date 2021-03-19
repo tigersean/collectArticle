@@ -24,7 +24,7 @@
 
   阻塞I/O模型属于最常见的I/O模型，在这五种I/O模型中都可以看到阻塞I/O的身影。默认情况下，所有的网络socket都是阻塞的。下面，我们就演示一下具体的数据处理过程：
 
-![img](/home/ejungon/Documents/收集的文章/linux中的“5种网络 IO 模型”.assets/wKiom1Lk9n_jCX0xAAGCKxp778o938.jpg)
+![img](./linux中的“5种网络 IO 模型”.assets/wKiom1Lk9n_jCX0xAAGCKxp778o938.jpg)
 
 
 
@@ -36,7 +36,7 @@
 
 当I/O模型为非阻塞I/O时，那么就相当于告诉内核，当进程请求的数据没完成时，这个进程就不会进入睡眠状态，而是返回一个错误信息。
 
-![img](/home/ejungon/Documents/收集的文章/linux中的"5种网络 IO 模型".assets/wKiom1LlB5iio2s5AAJAaXHMnXY497.jpg)
+![img](./linux中的"5种网络 IO 模型".assets/wKiom1LlB5iio2s5AAJAaXHMnXY497.jpg)
 
 
 在此，对上图的流程做简单的介绍:
@@ -50,7 +50,7 @@
 
 在I/O多路复用模型下，我们可以使用select或poll系统调用，而此时发生的阻塞是由select或poll产生的，而不是在真正的I/O系统调用上。
 
-![img](/home/ejungon/Documents/收集的文章/linux中的“5种网络 IO 模型”.assets/wKiom1LlEDzS7ituAAI5Q7bSs3o380.jpg)
+![img](./linux中的“5种网络 IO 模型”.assets/wKiom1LlEDzS7ituAAI5Q7bSs3o380.jpg)
 
 
 
@@ -66,7 +66,7 @@
 我们可以使用信号，来告诉内核当数据准备就绪的时候，使用SIGIO信号来通知我们。我们将此称为信号驱动的I/O。**
 **
 
-![img](/home/ejungon/Documents/收集的文章/linux中的“5种网络 IO 模型”.assets/wKiom1LlGP_QQG7dAAIgl94_2uI988.jpg)
+![img](./linux中的“5种网络 IO 模型”.assets/wKiom1LlGP_QQG7dAAIgl94_2uI988.jpg)
 
 在此，对上图的流程做简单的介绍:
 
@@ -79,7 +79,7 @@
 一般来说，异步I/O模型的实现是从操作步骤的开始到通知整个操作完成（包括将数据从内核复制到进程缓冲区中）。它和信号驱动I/O的主要不同是：信号I/O是在I/O操作正要开始的时候通知我们的，而异步I/O是当I/O操作完成时通知我们的。**
 **
 
-![img](/home/ejungon/Documents/收集的文章/linux中的“5种网络 IO 模型”.assets/wKioL1LlHvbD7NjtAAGuArYv-HA140.jpg)
+![img](./linux中的“5种网络 IO 模型”.assets/wKioL1LlHvbD7NjtAAGuArYv-HA140.jpg)
 
 在此，对上图的流程做简单的介绍:
 

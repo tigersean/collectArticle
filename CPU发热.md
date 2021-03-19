@@ -2,7 +2,7 @@
 
 从含有1亿4000万个场效应晶体管FET的奔腾4到高达80多亿的Kabylake，Intel忠实的按照摩尔定律增加着晶体管的数目。这么多个FET随着每一次的翻转都在消耗者能量。一个FET的简单示意图如下：
 
-![img](/home/ejungon/Documents/收集的文章/CPU发热.assets/v2-2f8750efcf6e5cb165a8ef7a6fdc56fb_720w.jpg)
+![img](./CPU发热.assets/v2-2f8750efcf6e5cb165a8ef7a6fdc56fb_720w.jpg)
 
 当输入低电平时，CL被充电，我们假设a焦耳的电能被储存在电容中。而当输入变成高电平后，这些电能则被释放，a焦耳的能量被释放了出来。因为CL很小，这个a也十分的小，几乎可以忽略不计。但如果我们以1GHz频率翻转这个FET，则能量消耗就是a × 10^9，这就不能忽略了，再加上CPU中有几十亿个FET，消耗的能量变得相当可观。
 
@@ -18,13 +18,13 @@ P代表能耗。C可以简单看作一个常数，它由制程等因素决定；
 
 让我们回头再来看看公式，你会发现电压和功耗可不是线性相关，而是平方的关系！再乘以f，情况就更加糟糕了。我们提高频率，同时不得不提高电压，造成P的大幅提高！我们回忆一下初中学过的y=x^3的函数图：
 
-![img](/home/ejungon/Documents/收集的文章/CPU发热.assets/v2-87102ddc7ce4c76d05bcd5960f918004_720w.jpg)
+![img](./CPU发热.assets/v2-87102ddc7ce4c76d05bcd5960f918004_720w.jpg)
 
 Y在经过前期缓慢的提高后在a点会开始陡峭的上升。这个a就是转折点，过了它，就划不来了。功耗和频率的关系也大抵如此，我们看两个实际的例子：
 
 ![img](https://pic4.zhimg.com/80/v2-8ec5a7a1ba5ef533363bb208c244c0c3_720w.jpg)i7-2600K频率和功耗的关系
 
-![img](/home/ejungon/Documents/收集的文章/CPU发热.assets/v2-76abc3219d3f8e3aa12b724db4f74f26_720w.jpg)Exynos频率和功耗的关系
+![img](./CPU发热.assets/v2-76abc3219d3f8e3aa12b724db4f74f26_720w.jpg)Exynos频率和功耗的关系
 
 从ARM和X86阵营来看，他们能耗曲线是不是和幂函数图很像？
 
@@ -40,7 +40,7 @@ Y在经过前期缓慢的提高后在a点会开始陡峭的上升。这个a就�
 
 综合这些，我们看一个实际的例子：
 
-![img](/home/ejungon/Documents/收集的文章/CPU发热.assets/v2-fb4d0be17d30fa304e330e853c8d09be_720w.jpg)
+![img](./CPU发热.assets/v2-fb4d0be17d30fa304e330e853c8d09be_720w.jpg)
 
 这里的Transition Power就是动态能耗，可以看出它随着频率陡峭上升；短路功耗和频率几乎呈现线性关系；而Static power就是指漏电功耗，它也上升是因为频率上升导致温度上升，从而漏电加重。
 

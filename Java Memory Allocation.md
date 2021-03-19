@@ -1,7 +1,7 @@
 # Java Memory Allocation: Stack vs Heap and other areas
 
 
-![Image for post](/home/ejungon/Documents/收集的文章/Java Memory Allocation.assets/1*rwdye-8w97N-v9I8p6q3AQ.png)
+![Image for post](./Java Memory Allocation.assets/1*rwdye-8w97N-v9I8p6q3AQ.png)
 
 Image from [Jamesdbloom blod](https://blog.jamesdbloom.com/JVMInternals.html#constant_pool)
 
@@ -52,7 +52,7 @@ The total memory allocated to JVM Stack is very less as compared to **Heap Memor
 
 Each thread will have the same amount of stack memory size. The default size can be customized by command **-Xss**
 
-![Image for post](/home/ejungon/Documents/收集的文章/Java Memory Allocation.assets/1*A5bXTdz0UZ_FzO1XrXOwWA.png)
+![Image for post](./Java Memory Allocation.assets/1*A5bXTdz0UZ_FzO1XrXOwWA.png)
 
 # 3. Native Method Area
 
@@ -78,7 +78,7 @@ It also has two parts: **Tenured** and **Permanent** (PermGen)**.** GC moves ali
 
 The HotSpot Java VM also includes a code cache, containing memory that is used for compilation and storage of native code.
 
-![Image for post](/home/ejungon/Documents/收集的文章/Java Memory Allocation.assets/1*UgLvuUz7EuuIZXYS17Wr9w.png)
+![Image for post](./Java Memory Allocation.assets/1*UgLvuUz7EuuIZXYS17Wr9w.png)
 
 Image by[ Java Honk](http://javahonk.com/how-many-types-memory-areas-allocated-by-jvm/)
 
@@ -94,7 +94,7 @@ These constants include literals specified by the programmer and symbolic  refer
 
 Consider an example from stack-overflow:
 
-![Image for post](/home/ejungon/Documents/收集的文章/Java Memory Allocation.assets/1*sUQmNLhWyRwT0R85HmAq-Q.png)
+![Image for post](./Java Memory Allocation.assets/1*sUQmNLhWyRwT0R85HmAq-Q.png)
 
 Example by [axtavt](https://stackoverflow.com/users/103154/axtavt)
 

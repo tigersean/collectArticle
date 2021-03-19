@@ -2,9 +2,9 @@
 
 # istio security 之 mTLS
 
-![img](/home/ejungon/Documents/收集的文章/istio security 之 mTLS.assets/v2-6d739cb1291c27a82c782535d8173abe_720w.jpg)
+![img](./istio security 之 mTLS.assets/v2-6d739cb1291c27a82c782535d8173abe_720w.jpg)
 
-![img](/home/ejungon/Documents/收集的文章/istio security 之 mTLS.assets/v2-89dad2ce8561d185d3e110b9d7d2482c_720w.jpg)
+![img](./istio security 之 mTLS.assets/v2-89dad2ce8561d185d3e110b9d7d2482c_720w.jpg)
 
 istio mesh 的认证(Authentication)默认采取宽容模式（PERMISSIVE mode），这对暴露出去的 API 是极不安全的，我们可以开启双向 TLS 认证来为 API 提供安全保障。
 

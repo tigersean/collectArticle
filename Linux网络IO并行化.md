@@ -16,11 +16,11 @@
 
 首先我们先回顾一下Linux协议栈的分层结构，如下图：
 
-[[![img](/home/ejungon/Documents/收集的文章/Linux网络IO并行化.assets/linux_net_overview.png)](https://github.com/liucimin/Learning/blob/master/Images/linux_net_overview.png)
+[[![img](./Linux网络IO并行化.assets/linux_net_overview.png)](https://github.com/liucimin/Learning/blob/master/Images/linux_net_overview.png)
 
 最底层是硬件网卡(NIC)，它通常通过两个内存环型队列(rx_ring/tx_ring)加上中断机制与操作系统进行通讯。当NIC收到数据包后，它将数据包写入rx_ring并产生中断。CPU收到中断后OS将陷入中断处理程序中执行，这在Linux内核中叫Hard-IRQ。
 
-[![img](/home/ejungon/Documents/收集的文章/Linux网络IO并行化.assets/QQ20170808-221548.png)](https://raw.githubusercontent.com/liucimin/Learning/master/Images/QQ20170808-221548.png)
+[![img](./Linux网络IO并行化.assets/QQ20170808-221548.png)](https://raw.githubusercontent.com/liucimin/Learning/master/Images/QQ20170808-221548.png)
 
 
 
@@ -117,7 +117,7 @@ cat /proc/interrupts
 
 在没有多队列网卡的服务器上，比如一个典型的场景是虚拟机或云主机，如何优化网络IO呢？下面要介绍的是纯软件的优化方案：RPS & RFS， 这是在2.6.35内核加入的由Google工程师Tom Herbert开发的优化补丁。它的工作原理如下图所示：
 
-[![img](/home/ejungon/Documents/收集的文章/Linux网络IO并行化.assets/68747470733a2f2f322e62702e626c6f6773706f742e636f6d2f2d384662794f35465a5538732f57597143497142784862492f41414141414141415041672f4e70737965306457585277754f46556349503859436f75554f4a334b725a702d51434c63424741732f733430302f6c696e75785f6e65745f7270732e706e67)](https://2.bp.blogspot.com/-8FbyO5FZU8s/WYqCIqBxHbI/AAAAAAAAPAg/Npsye0dWXRwuOFUcIP8YCouUOJ3KrZp-QCLcBGAs/s1600/linux_net_rps.png)
+[![img](./Linux网络IO并行化.assets/68747470733a2f2f322e62702e626c6f6773706f742e636f6d2f2d384662794f35465a5538732f57597143497142784862492f41414141414141415041672f4e70737965306457585277754f46556349503859436f75554f4a334b725a702d51434c63424741732f733430302f6c696e75785f6e65745f7270732e706e67)](https://2.bp.blogspot.com/-8FbyO5FZU8s/WYqCIqBxHbI/AAAAAAAAPAg/Npsye0dWXRwuOFUcIP8YCouUOJ3KrZp-QCLcBGAs/s1600/linux_net_rps.png)
 
 
 
@@ -163,7 +163,7 @@ rfs的目标是在选择报文交给哪个cpu处理时，选择的是应用程�
 
 RFS尝试优化这个问题，它尽力将收到数据包分发给接收它的进程所在的core上，先看一下原理图：
 
-[![img](/home/ejungon/Documents/收集的文章/Linux网络IO并行化.assets/68747470733a2f2f332e62702e626c6f6773706f742e636f6d2f2d44664877364969766b5a4d2f57597143766c6c4f5278492f414141414141414150416f2f59466433734d377153545974425f70734d4c71686e31635a7830304c7943396c67434c63424741732f733430302f6c696e75785f6e65745f7266732e706e67)](https://3.bp.blogspot.com/-DfHw6IivkZM/WYqCvllORxI/AAAAAAAAPAo/YFd3sM7qSTYtB_psMLqhn1cZx00LyC9lgCLcBGAs/s1600/linux_net_rfs.png)
+[![img](./Linux网络IO并行化.assets/68747470733a2f2f332e62702e626c6f6773706f742e636f6d2f2d44664877364969766b5a4d2f57597143766c6c4f5278492f414141414141414150416f2f59466433734d377153545974425f70734d4c71686e31635a7830304c7943396c67434c63424741732f733430302f6c696e75785f6e65745f7266732e706e67)](https://3.bp.blogspot.com/-DfHw6IivkZM/WYqCvllORxI/AAAAAAAAPAo/YFd3sM7qSTYtB_psMLqhn1cZx00LyC9lgCLcBGAs/s1600/linux_net_rfs.png)
 
 首先RFS会维护一张全局的路由表（图中SockFlowTable），表中记录了一个FlowHash(四元组的Hash值)到对应CPU核的路由项。表项怎么建立呢？是在进程调用某socket的recvmsg系统调用(也包括recv/recvfrom)时，将该socket的FlowHash值（由最后一次收到包的FlowHash决定）与当前的CPU核关联起来。在RPS做包转发时，实际它会先判断是否启用了RFS，并且能找到有效的RFS路由项，否则的话仍使用默认RPS逻缉进行转发。
 

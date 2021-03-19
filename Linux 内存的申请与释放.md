@@ -90,7 +90,7 @@ echo 1 > /proc/sys/vm/compact_memory
 
 buddy算法与slab,malloc之间的关系可以简单的以下图表示:
 
-<img src="/home/ejungon/Documents/收集的文章/Linux 内存的申请与释放.assets/buddy_struct.jpg" alt="img" style="zoom:80%;" /> 		
+<img src="./Linux 内存的申请与释放.assets/buddy_struct.jpg" alt="img" style="zoom:80%;" /> 		
 
 ​	从上图可以看出：
 
@@ -219,8 +219,8 @@ int main(void)
 
 ## 	内存申请的流程
 
-![img](/home/ejungon/Documents/收集的文章/Linux 内存的申请与释放.assets/malloc.jpg) 		
-![img](/home/ejungon/Documents/收集的文章/Linux 内存的申请与释放.assets/malloc_ex.jpg) 		
+![img](./Linux 内存的申请与释放.assets/malloc.jpg) 		
+![img](./Linux 内存的申请与释放.assets/malloc_ex.jpg) 		
 
 
 
@@ -264,7 +264,7 @@ malloc在用户使用时，其内部使用的是 lazy机制：
 - VSS(Virtual 	Set size)：用户调用malloc返回的虚拟地址空间大小
 - RSS(resident 	set size)：用户真正获取到的对应的物理内存空间(驻留内存)大小
 
-![img](/home/ejungon/Documents/收集的文章/Linux 内存的申请与释放.assets/vss_rss.jpg) 		
+![img](./Linux 内存的申请与释放.assets/vss_rss.jpg) 		
 
 #### 	引发的问题
 

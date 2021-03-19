@@ -86,7 +86,7 @@
 
 
 
-![img](/home/ejungon/Documents/收集的文章/kube-proxy iptables 模式.assets/v2-68f3aa78a480b26c29f45f8ac76598c6_720w.jpg)iptables 数据包流向图 （出自：https://www.zsythink.net/archives/1199）
+![img](./kube-proxy iptables 模式.assets/v2-68f3aa78a480b26c29f45f8ac76598c6_720w.jpg)iptables 数据包流向图 （出自：https://www.zsythink.net/archives/1199）
 
 iptable的操作（需要root权限）命令可以总结如下：
 

@@ -12,7 +12,7 @@
 
  
 
-![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/0)
+![img](./Linux TCP队列相关参数的总结.assets/0)
 
  
 
@@ -43,7 +43,7 @@
 
  
 
-![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/111)
+![img](./Linux TCP队列相关参数的总结.assets/111)
 
 数据包的接收，从下往上经过了三层：网卡驱动、系统内核空间，最后到用户态空间的应用。Linux内核使用sk_buff(socketkernel buffers)数据结构描述一个数据包。当一个新的数据包到达，NIC（networkinterface controller）调用DMAengine，通过RingBuffer将数据包放置到内核内存区。RingBuffer的大小固定，它不包含实际的数据包，而是包含了指向sk_buff的描述符。当RingBuffer满的时候，新来的数据包将给丢弃。一旦数据包被成功接收，NIC发起中断，由内核的中断处理程序将数据包传递给IP层。经过IP层的处理，数据包被放入队列等待TCP层处理。每个数据包经过TCP层一系列复杂的步骤，更新TCP状态机，最终到达recvBuffer，等待被应用接收处理。有一点需要注意，数据包到达recvBuffer，TCP就会回ACK确认，既TCP的ACK表示数据包已经被操作系统内核收到，但并不确保应用层一定收到数据（例如这个时候系统crash），因此一般建议应用协议层也要设计自己的确认机制。
 
@@ -58,7 +58,7 @@
 
    详细的说明参考内核文档LinuxEthernet Bonding Driver HOWTO。我们可以通过cat/proc/net/bonding/bond0查看本机的Bonding模式：
 
-   ![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/222)
+   ![img](./Linux TCP队列相关参数的总结.assets/222)
 
    一般很少需要开发去设置网卡Bonding模式，自己实验的话可以参考这篇文档
 
@@ -73,10 +73,10 @@
 3. 网卡多队列及中断绑定
    随着网络的带宽的不断提升，单核CPU已经不能满足网卡的需求，这时通过多队列网卡驱动的支持，可以将每个队列通过中断绑定到不同的CPU核上，充分利用多核提升数据包的处理能力。
    首先查看网卡是否支持多队列，使用lspci-vvv命令，找到Ethernetcontroller项：
-   ![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/333)
+   ![img](./Linux TCP队列相关参数的总结.assets/333)
    如果有MSI-X， Enable+ 并且Count > 1，则该网卡是多队列网卡。
    然后查看是否打开了网卡多队列。使用命令cat/proc/interrupts，如果看到eth0-TxRx-0表明多队列支持已经打开：
-   ![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/444)
+   ![img](./Linux TCP队列相关参数的总结.assets/444)
    最后确认每个队列是否绑定到不同的CPU。cat/proc/interrupts查询到每个队列的中断号，对应的文件/proc/irq/${IRQ_NUM}/smp_affinity为中断号IRQ_NUM绑定的CPU核的情况。以十六进制表示，每一位代表一个CPU核：
 
    （00000001）代表CPU0（00000010）代表CPU1（00000011）代表CPU0和CPU1
@@ -92,9 +92,9 @@
 4. RingBuffer
    Ring Buffer位于NIC和IP层之间，是一个典型的FIFO（先进先出）环形队列。RingBuffer没有包含数据本身，而是包含了指向sk_buff（socketkernel buffers）的描述符。
    可以使用ethtool-g eth0查看当前RingBuffer的设置：
-   ![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/555)
+   ![img](./Linux TCP队列相关参数的总结.assets/555)
    上面的例子接收队列为4096，传输队列为256。可以通过ifconfig观察接收和传输队列的运行状况：
-   ![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/666)
+   ![img](./Linux TCP队列相关参数的总结.assets/666)
 
 5. - RXerrors：收包总的错误数
    - RX dropped:表示数据包已经进入了RingBuffer，但是由于内存不够等系统原因，导致在拷贝到内存的过程中被丢弃。
@@ -127,7 +127,7 @@
  
 
 发送数据包经过的路径：
-![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/777)
+![img](./Linux TCP队列相关参数的总结.assets/777)
 和接收数据的路径相反，数据包的发送从上往下也经过了三层：用户态空间的应用、系统内核空间、最后到网卡驱动。应用先将数据写入TCP sendbuffer，TCP层将sendbuffer中的数据构建成数据包转交给IP层。IP层会将待发送的数据包放入队列QDisc(queueingdiscipline)。数据包成功放入QDisc后，指向数据包的描述符sk_buff被放入RingBuffer输出队列，随后网卡驱动调用DMAengine将数据发送到网络链路上。
 
  
@@ -144,24 +144,24 @@
 2. **QDisc**
    QDisc（queueing discipline ）位于IP层和网卡的ringbuffer之间。我们已经知道，ringbuffer是一个简单的FIFO队列，这种设计使网卡的驱动层保持简单和快速。而QDisc实现了流量管理的高级功能，包括流量分类，优先级和流量整形（rate-shaping）。可以使用tc命令配置QDisc。
    QDisc的队列长度由txqueuelen设置，和接收数据包的队列长度由内核参数net.core.netdev_max_backlog控制所不同，txqueuelen是和网卡关联，可以用ifconfig命令查看当前的大小：
-   ![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/888)
+   ![img](./Linux TCP队列相关参数的总结.assets/888)
    使用ifconfig调整txqueuelen的大小：
 
    ifconfig eth0 txqueuelen 2000
 
 3. **RingBuffer**
    和数据包的接收一样，发送数据包也要经过RingBuffer，使用ethtool-g eth0查看：
-   ![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/999)
+   ![img](./Linux TCP队列相关参数的总结.assets/999)
    其中TX项是RingBuffer的传输队列，也就是发送队列的长度。设置也是使用命令ethtool-G。
 
 4. **TCPSegmentation和Checksum Offloading
    **操作系统可以把一些TCP/IP的功能转交给网卡去完成，特别是Segmentation(分片)和checksum的计算，这样可以节省CPU资源，并且由硬件代替OS执行这些操作会带来性能的提升。
    一般以太网的MTU（MaximumTransmission Unit）为1500 bytes，假设应用要发送数据包的大小为7300bytes，MTU1500字节－ IP头部20字节 －TCP头部20字节＝有效负载为1460字节，因此7300字节需要拆分成5个segment：
-   ![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/1000)
+   ![img](./Linux TCP队列相关参数的总结.assets/1000)
    Segmentation(分片)操作可以由操作系统移交给网卡完成，虽然最终线路上仍然是传输5个包，但这样节省了CPU资源并带来性能的提升：
-   ![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/1001)
+   ![img](./Linux TCP队列相关参数的总结.assets/1001)
    可以使用ethtool-k eth0查看网卡当前的offloading情况：
-   ![img](/home/ejungon/Documents/收集的文章/Linux TCP队列相关参数的总结.assets/1002)
+   ![img](./Linux TCP队列相关参数的总结.assets/1002)
    上面这个例子checksum和tcpsegmentation的offloading都是打开的。如果想设置网卡的offloading开关，可以使用ethtool-K(注意K是大写)命令，例如下面的命令关闭了tcp segmentation offload：
 
    sudo ethtool -K eth0 tso off
