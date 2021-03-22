@@ -16,15 +16,15 @@
 
 首先我们先回顾一下Linux协议栈的分层结构，如下图：
 
-[[![img](./Linux网络IO并行化.assets/linux_net_overview.png)](https://github.com/liucimin/Learning/blob/master/Images/linux_net_overview.png)
+[![img](./Linux网络IO并行化.assets/linux_net_overview.png)
 
 最底层是硬件网卡(NIC)，它通常通过两个内存环型队列(rx_ring/tx_ring)加上中断机制与操作系统进行通讯。当NIC收到数据包后，它将数据包写入rx_ring并产生中断。CPU收到中断后OS将陷入中断处理程序中执行，这在Linux内核中叫Hard-IRQ。
 
-[![img](./Linux网络IO并行化.assets/QQ20170808-221548.png)](https://raw.githubusercontent.com/liucimin/Learning/master/Images/QQ20170808-221548.png)
+![img](./Linux网络IO并行化.assets/QQ20170808-221548.png)
 
 
 
-![img](https://raw.githubusercontent.com/yongman/i/img/picgo/20200515173225.png)
+![img](Linux网络IO并行化.assets/20200515173225.png)
 
 在较老版内核中，网卡Hard-IRQ程序将数据包从rx_ring中取出并放入PerCPU的一个叫backlog的队列，然后发起一个Soft-IRQ来处理backlog队列 (内核将中断处理中无需实时同步完成的工作delay到一个准实时的异步时机去执行，这个异步机制即Soft-IRQ)。
 
@@ -60,11 +60,11 @@ cat /proc/interrupts
 
 下面回到网络IO的主题上，从网卡中断的角度看协议栈处理，如下图：
 
-[![img](https://camo.githubusercontent.com/63241152aa2fdd0aaab8cc538ab83f4be19eb3b32ea2ca81b1e6668407b138ae/68747470733a2f2f322e62702e626c6f6773706f742e636f6d2f2d6f6d6b6a563055582d376f2f57597141594971385537492f414141414141414150414d2f51554a46574a756453636b475572635f484a7a4961636d3342717a646642496e77434c63424741732f733430302f6c696e75785f6e65745f69727173636865642e706e67)]
+![68747470733](Linux网络IO并行化.assets/68747470733.png)
 
 下图
 
-[![img](https://2.bp.blogspot.com/-omkjV0UX-7o/WYqAYIq8U7I/AAAAAAAAPAM/QUJFWJudSckGUrc_HJzIacm3BqzdfBInwCLcBGAs/s1600/linux_net_irqsched.png)]
+[![img](Linux网络IO并行化.assets/linux_net_irqsched.png)]
 
 传统的网卡每块设备有一个中断号，它由上述的调度机制为每个中断请求分配给一个唯一的core来执行。在此场景下，你会发现协议栈处理的并行化是以网卡设备为粒度的。
 

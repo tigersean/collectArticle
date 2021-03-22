@@ -4,7 +4,7 @@
 
 ### perf stat 输出解读
 
-![img](https://zhengheng.me/content/images/2015/11/perf_1.png)
+![perf_1](perf_stat.assets/perf_1.png)
 
 - `task-clock`：用于执行程序的CPU时间，单位是ms(毫秒)。第二列中的`CPU utillized`则是指这个进程在运行perf的这段时间内的CPU利用率，该数值是由`task-clock`除以最后一行的`time elapsed`(也就是`wall time`，真实时间，单位为秒，下面的`M/sec`等数值都是除以这个数得到的)再除以1000得出的。
 
@@ -14,7 +14,9 @@
 
   > 这里要注意下CPU迁移和上下文切换的不同之处：发生上下文切换时**不一定**会发生CPU迁移，而发生CPU迁移时**肯定**会发生上下文切换。发生上下文切换时有可能只是把上下文从当前CPU中换出，下一次调度器还是将进程安排在这个CPU上执行。
 
-- `page-faults`：缺页。指当内存访问时先根据进程虚拟地址空间中的虚拟地址通过MMU查找该内存页在物理内存的映射，没有找到该映射，则发生缺页，然后通过CPU中断调用处理函数，从物理内存中读取。见下图所示的例子(MMU，`Memory Management Unit`，是CPU中负责将负责虚拟地址映射为物理地址的单元)：![img](https://zhengheng.me/content/images/2015/11/perf_2.png)
+- `page-faults`：缺页。指当内存访问时先根据进程虚拟地址空间中的虚拟地址通过MMU查找该内存页在物理内存的映射，没有找到该映射，则发生缺页，然后通过CPU中断调用处理函数，从物理内存中读取。见下图所示的例子(MMU，`Memory Management Unit`，是CPU中负责将负责虚拟地址映射为物理地址的单元)：
+
+  ![perf_2](perf_stat.assets/perf_2.png)
 
 - `cycles`：CPU时钟周期。CPU从它的指令集(`instruction set`)中选择指令执行。一个指令包含以下的步骤，每个步骤由CPU的一个叫做功能单元(`functional unit`)的组件来进行处理，每个步骤的执行都至少需要花费一个时钟周期。
 
@@ -50,17 +52,24 @@
 
 要理解`CPU缓存`是什么，需要先了解下[CPU的缓存架构](http://baike.baidu.com/view/206014.htm)，如下图：
 
-![img](https://zhengheng.me/content/images/2015/11/perf_3.png)
+![perf_3](perf_stat.assets/perf_3.png)
 
 1. `level-1 data cache`：一级数据缓存(`I$`)
+
 2. `level-1 inst cache`：一级指令缓存(`D$`)
+
 3. `MMU`：[内存管理单元](http://baike.baidu.com/view/969924.htm)
+
 4. `TLB`：转换后援缓存(`translation lookaside buffer`)
+
 5. `level-2 cache`：二级缓存(`E$`)
+
 6. `level-3 cache`：三级缓存
     处理器读取数据过程如下面两个图：
-![img](https://zhengheng.me/content/images/2015/11/perf_4.png)
-![img](https://zhengheng.me/content/images/2015/11/perf_5.png)
+
+![perf_4](perf_stat.assets/perf_4.png)
+    
+    ![perf_5](perf_stat.assets/perf_5.png)
 
 > 1. CPU根据虚拟地址尝试从一级缓存(*存放的是虚拟地址的索引*)中读取数据；
 > 2. 如果一级缓存中查找不到，则需向MMU请求数据；
@@ -127,3 +136,5 @@ List of pre-defined events (to be used in -e):
 ```shell
 perf stat -e cycles,instructions,L1-dcache-loads,L1-dcache-load-misses,LLC-loads,LLC-load-misses,dTLB-loads,dTLB-load-misses -p 316 sleep 10  
 ```
+
+![perf_6](perf_stat.assets/perf_6.png)

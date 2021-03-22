@@ -113,8 +113,9 @@ $ sysctl -w net.netfilter.nf_conntrack_max=1048576 $ sysctl -w net.netfilter.nf_
 排除了防火墙的因素，我们从底向上来看Linux接收数据包的处理过程，首先是网卡驱动层。
 
 如下图所示，物理介质上的数据帧到达后首先由NIC（网络适配器）读取，写入设备内部缓冲区Ring  Buffer中，再由中断处理程序触发Softirq从中消费，Ring  Buffer的大小因网卡设备而异。当网络数据包到达（生产）的速率快于内核处理（消费）的速率时，Ring  Buffer很快会被填满，新来的数据包将被丢弃。
- [![img](https://img1.sdnlab.com/wp-content/uploads/2016/08/linux-server-packet-fig-1.png)](https://img1.sdnlab.com/wp-content/uploads/2016/08/linux-server-packet-fig-1.png)
- **如何确认**
+ ![img](Linux服务器丢包故障的解决思路及引申的TCPIP协议栈理论 .assets/linux-server-packet-fig-1.png)
+
+**如何确认**
  通过ethtool或/proc/net/dev可以查看因Ring Buffer满而丢弃的包统计，在统计项中以fifo标识：
 
 
@@ -283,7 +284,7 @@ $ sysctl -w net.ipv4.tcp_syncookies=1 net.ipv4.tcp_syncookies = 1
 ## PAWS
 
 PAWS全名Protect Againest Wrapped Sequence numbers，目的是解决在高带宽下，TCP序列号在一次会话中可能被重复使用而带来的问题。
- [![img](https://img1.sdnlab.com/wp-content/uploads/2016/08/linux-server-packet-fig-2.png)](https://img1.sdnlab.com/wp-content/uploads/2016/08/linux-server-packet-fig-2.png)
+ ![img](Linux服务器丢包故障的解决思路及引申的TCPIP协议栈理论 .assets/linux-server-packet-fig-2.png)
  如上图所示，客户端发送的序列号为A的数据包A1因某些原因在网络中“迷路”，在一定时间没有到达服务端，客户端超时重传序列号为A的数据包A2，接下来假设带宽足够，传输用尽序列号空间，重新使用A，此时服务端等待的是序列号为A的数据包A3，而恰巧此时前面“迷路”的A1到达服务端，如果服务端仅靠序列号A就判断数据包合法，就会将错误的数据传递到用户态程序，造成程序异常。
 
 PAWS要解决的就是上述问题，它依赖于timestamp机制，理论依据是：在一条正常的TCP流中，按序接收到的所有TCP数据包中的timestamp都应该是单调非递减的，这样就能判断那些timestamp小于当前TCP流已处理的最大timestamp值的报文是延迟到达的重复报文，可以予以丢弃。在上文的例子中，服务器已经处理数据包Z，而后到来的A1包的timestamp必然小于Z包的timestamp，因此服务端会丢弃迟到的A1包，等待正确的报文到来。
