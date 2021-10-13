@@ -4,11 +4,11 @@ Jun 30, 2017 |  Hits
 
 TIME-WAIT 是 TCP 挥手过程的一个状态。很多地方都对它有说明，这里只贴两个图唤起记忆。下面是 TCP 完整的状态图：
 
-[![来自：http://www.tcpipguide.com/free/t_TCPOperationalOverviewandtheTCPFiniteStateMachineF-2.htm](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TCP-State.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TCP-State.png)来自：http://www.tcpipguide.com/free/t_TCPOperationalOverviewandtheTCPFiniteStateMachineF-2.htm
+[![来自：http://www.tcpipguide.com/free/t_TCPOperationalOverviewandtheTCPFiniteStateMachineF-2.htm](TCP TIME-WAIT.assets/TCP-State.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TCP-State.png)来自：http://www.tcpipguide.com/free/t_TCPOperationalOverviewandtheTCPFiniteStateMachineF-2.htm
 
 看到最下面有个 TIME-WAIT 状态。状态图可能看着不那么直观，可以看这个：
 
-[![来自：http://www.tcpipguide.com/free/t_TCPConnectionTermination-2.htm](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TCP-Fin.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TCP-Fin.png)来自：http://www.tcpipguide.com/free/t_TCPConnectionTermination-2.htm
+[![来自：http://www.tcpipguide.com/free/t_TCPConnectionTermination-2.htm](TCP TIME-WAIT.assets/TCP-Fin.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TCP-Fin.png)来自：http://www.tcpipguide.com/free/t_TCPConnectionTermination-2.htm
 
 上面实际不一定是只有 Client 才能进入 TIME-WAIT 状态，而是谁发起 TCP 连接断开先发的 FIN，谁最终就进入 TIME-WAIT 状态。
 
@@ -16,7 +16,7 @@ TIME-WAIT 是 TCP 挥手过程的一个状态。很多地方都对它有说明�
 
 第一个作用是避免上一个连接延迟到达的数据包被下一个连接错误接收。如下图所示：
 
-[![来自：https://vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TIME-WAIT-Function.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TIME-WAIT-Function.png)来自：https://vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux
+[![来自：https://vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux](TCP TIME-WAIT.assets/TIME-WAIT-Function.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TIME-WAIT-Function.png)来自：https://vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux
 
 虚线将两次连接分开，两次连接都使用的同一组 TCP Tuple，即 Source IP, Source Port, Destination IP, Destination Port 组合。第一次连接中 SEQ 为 3 的数据包出现了重发，第二次连接中刚好再次使用 SEQ 为 3  这个序号的时候，第一次连接中本来发丢(延迟)的 SEQ 为 3 的数据包在此时到达，就导致这个延迟了的 SEQ 为 3  的数据包被当做正确的数据而接收，之后如果还有 SEQ 为 3 的正常数据包到达会被接收方认为是重复数据包而直接丢弃，导致 TCP  连接接收的数据错误。
 
@@ -88,7 +88,7 @@ TCP 握手时，通信双方如果都带有 TCP Timestamp 则表示双方都支�
 
 从 PAWS 的全名上大概能猜想出来它是干什么的。正常来说每个 TCP 包都会有自己唯一的 SEQ，出现 TCP 数据包重传的时候会复用 SEQ  号，这样接收方能通过 SEQ 号来判断数据包的唯一性，也能在重复收到某个数据包的时候判断数据是不是重传的。但是 TCP 这个 SEQ  号是有限的，一共 32 bit，SEQ 开始是递增，溢出之后从 0 开始再次依次递增。所以当 SEQ 号出现溢出后单纯通过 SEQ  号无法标识数据包的唯一性，某个数据包延迟或因重发而延迟时可能导致连接传递的数据被破坏，比如：
 
-[![来自:http://www.sdnlab.com/17530.html](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TCP-Delay.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TCP-Delay.png)来自:http://www.sdnlab.com/17530.html
+[![来自:http://www.sdnlab.com/17530.html](TCP TIME-WAIT.assets/TCP-Delay.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/TCP-Delay.png)来自:http://www.sdnlab.com/17530.html
 
 上图 A 数据包出现了重传，并在 SEQ 号耗尽再次从 A 递增时，第一次发的 A 数据包延迟到达了  Server，这种情况下如果没有别的机制来保证，Server 会认为延迟到达的 A 数据包是正确的而接收，反而是将正常的第三次发的 SEQ 为 A 的数据包丢弃，造成数据传输错误。PAWS 就是为了避免这个问题而产生的。在开启 Timestamp 机制情况下，一台机器发的所有 TCP 包的 TSval 都是单调递增的，PAWS 要求连接双方维护最近一次收到的数据包的 TSval 值，每收到一个新数据包都会读取数据包中的 TSval 值跟 Recent TSval 值做比较，如果发现收到的数据包 TSval 没有递增，则直接丢弃这个数据包。对于上面图中的例子有了 PAWS  机制就能做到在收到 Delay 到达的 A 号数据包时，识别出它是个过期的数据包而将其丢掉。[tcp_peer_is_proven 是 Linux 一个做 PAWS 检查的函数](http://elixir.free-electrons.com/linux/v4.11.8/source/net/ipv4/tcp_metrics.c#L576)。
 
@@ -127,7 +127,7 @@ PAWS established rejected 是正常建立连接后，因为数据包没有通过
 
 另一个作用是避免主动断开连接一方最后一个回复的 ACK 丢失而被动断开连接一方一直处在 LAST ACK 状态，超时后会再次发 FIN  到主动断开连接一方。此时如果主动断开连接一方不在 Time Wait 会触发主动断开连接一方发出 RST 让被动连接一方出现一个  Connection reset by peer 的报错。不过这个实际上还好，数据至少都发完了。如果被动断开连接一方还未因超时而重发 FIN  就收到主动断开连接一方因为 tcp_tw_reuse 提前从 TIME WAIT 状态退出而发出的 SYN，被动连接一方会立即重发  FIN，主动连接一方收到 FIN 后回复 RST，之后再重发 SYN 开始正常的 TCP 握手。后一个过程图如下：
 
-[![来自：https://vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/tcp_tw_reuse.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/tcp_tw_reuse.png)来自：https://vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux
+[![来自：https://vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux](TCP TIME-WAIT.assets/tcp_tw_reuse.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/tcp_tw_reuse.png)来自：https://vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux
 
 [这篇文章](https://vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux) 说没有开启 TCP Timestamp 时，被动断开连接一方处在 LAST_ACK 状态，收到 SYN 后会回复 RST；开启了 TCP  Timestamp 之后，被动连接一方处在 LAST_ACK 状态收到 SYN 会丢弃这个 SYN，在 FIN 超时后再次发 FIN,  ACK，这里我有些疑惑。不明白为什么 TCP Timestamp 开启之后处在 LAST ACK 状态的一方就会默认丢弃对方发来的  SYN。PAWS 只有 Timestamp 不和要求时才会丢消息，但同一台机器上没有重启的话 TSval 是逐步递增的，[SEQ 号也是在原来 TIME WAIT 时存下的 SEQ 号基础上加一个偏移值得到](http://elixir.free-electrons.com/linux/latest/source/net/ipv4/tcp_ipv4.c#L130)，按说没有理由会自动丢弃 SYN 的。
 
@@ -243,7 +243,7 @@ The amount of time the kernel will wait before it closes the socket, regardless 
 有两个作用：
 一个是 `bind()` socket 时可以绑定 “any address” IPv4 下是 `0.0.0.0` 或在 IPv6 下是`::`。SO_REUSEADDR 不开启的话，这个 any address 会和机器具体使用的 IP 冲突，如果绑定的端口一致会报错。比如本地有两个网卡，IP 分别是  192.168.0.1 和 10.0.0.1。如果不开启 SO_REUSEADDR，绑定 0.0.0.0 的某个端口比如 21  之后，再想绑定某个具体的 IP 192.168.0.1 的 21 端口就不允许了。而开启 SO_REUSEADDR 之后除非是 IP 和  Port 都被绑定过才会报错。有个表：
 
-[![来自: https://stackoverflow.com/questions/14388706/socket-options-so-reuseaddr-and-so-reuseport-how-do-they-differ-do-they-mean-t](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/so-reuseaddr.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/so-reuseaddr.png)来自: https://stackoverflow.com/questions/14388706/socket-options-so-reuseaddr-and-so-reuseport-how-do-they-differ-do-they-mean-t
+[![来自: https://stackoverflow.com/questions/14388706/socket-options-so-reuseaddr-and-so-reuseport-how-do-they-differ-do-they-mean-t](TCP TIME-WAIT.assets/so-reuseaddr.png)](https://ylgrgyq.github.io/2017/06/30/tcp-time-wait/so-reuseaddr.png)来自: https://stackoverflow.com/questions/14388706/socket-options-so-reuseaddr-and-so-reuseport-how-do-they-differ-do-they-mean-t
 
 上表中全部默认使用 BSD 系统，并且是 socketA 先绑定，之后再绑定 socketB。ON/OFF表示 SO_REUSEADDR 是否开启不会影响结果。
 

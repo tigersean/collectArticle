@@ -10,11 +10,7 @@
 
 ### **一、连接建立**
 
- 
-
-![img](./Linux TCP队列相关参数的总结.assets/0)
-
- 
+![img](Linux TCP队列相关参数的总结.assets/0-20211013232742723.jpeg) 
 
 简单看下连接的建立过程，客户端向server发送SYN包，server回复SYN＋ACK，同时将这个处于SYN_RECV状态的连接保存到半连接队列。客户端返回ACK包完成三次握手，server将ESTABLISHED状态的连接移入accept队列，等待应用调用accept()。
 
